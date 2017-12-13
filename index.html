@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <style>
+    *{
+        box-sizing:border-box;
+    }
+    body{
+        background: #131313;
+    }
+        .wrapper{
+            margin:30px auto;
+            width:600px;
+            padding:50px 50px 70px;
+            text-align:center;
+            color:#999;
+            background: #222;
+            border-radius:4px;
+            display: flex;
+            flex: 1;
+        }
+        .form-component{
+            flex:1;
+            margin-right:15px;
+        }
+        .item-list{
+            margin: 30px 0 0 15px;
+            flex: 1;
+            color: #222;
+            background: #efe9e9;
+            border-radius: 6px;
+            padding: 20px 10px;
+            height:320px;
+            overflow-y:auto;
+        }
+        .item{
+            padding: 10px;
+            text-align: left;
+        }
+        form{
+            text-align: left;
+        }
+        input{
+            width:100%;
+            height:36px;
+            padding:10px;
+            background:#efe9e9;
+            border-color:#efe9e9;
+        }
+        .btn{
+            text-decoration: none;
+            display:inline-block;
+            padding:5px 10px;
+            border:1px solid #ccc;
+            text-align: center;
+            text-transform: capitalize;
+            color:#777;
+            border-radius:4px;
+            font-size:12px;
+        }
+        .default:hover{
+            background:#fff;
+        }
+        .btn.danger{
+            color:#fff;
+            background:red;
+        }
+        .btn.danger:hover{
+            background: darkred;
+        }
+
+
+    </style>
+</head>
+<body onload=fetchBookmark();>
+    <div class="wrapper">
+        <div class="form-component">
+            <h1>Add your page</h1><br/><br/>
+            <form id="myForm">
+                <label>Name</label><br/><br/>
+                <input type="text" id="pageName" placeholder="page name" required/><br/><br/>
+                <label>Url</label><br/><br/>
+                <input type="url" id="pageUrl" placeholder="http://example.com" required/><br/><br/><br/>
+                <input type="submit" value="submit"/>
+            </form>
+        </div>
+
+        <div class="item-list" id="displayItem"></div>
+    </div>
+
+
+    <script>
+    document.getElementById('myForm').addEventListener('submit', saveItem);
+
+    function saveItem(e){
+
+        //prevent from submitting
+        e.preventDefault();
+
+
+        //Get form values
+        let pageName = document.getElementById('pageName').value;
+        let pageUrl = document.getElementById('pageUrl').value;
+
+        if(!pageName || !pageUrl){
+            alert('PLease fill in the form');
+            return false;
+        }
+
+        let bookmark = {
+            name: pageName,
+            url: pageUrl
+        }
+
+     
+        if(localStorage.getItem('bookmarks') === null){
+             //init array
+            let bookmarks = [];
+            //add to array
+            bookmarks.push(bookmark); 
+            //set to localStorage
+            localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+        }else{
+            // get data form localStorage
+            let bookmarks = JSON.parse(localStorage.getItem('bookmarks'));
+            //add to array
+            bookmarks.push(bookmark); 
+            //set to localStorage
+            localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+        }
+
+        document.getElementById('myForm').reset();
+
+        fetchBookmark();
+
+
+    }
+
+    function fetchBookmark(){
+        // get data form localStorage
+        let bookmarks = JSON.parse(localStorage.getItem('bookmarks'));
+        let displayBookmark = document.getElementById('displayItem');
+    
+        
+        displayBookmark.innerHTML = '';
+        for (let i=0; i< bookmarks.length; i++){
+            let name = bookmarks[i].name;
+            let url = bookmarks[i].url;
+            let html = `
+                 <div class="item">
+                    <span>${name}</span>
+                    <a href="${url}" class="btn default">visit</a>
+                    <a href="#" onclick="deleteItem('${url}')" class="btn danger">Delete</a>
+                </div>
+            `;
+            displayBookmark.innerHTML += html;
+        }
+        console.log(bookmarks,'new'); 
+    }
+    function deleteItem(url){
+        let bookmarks = JSON.parse(localStorage.getItem('bookmarks'));
+        for (let i=0; i< bookmarks.length; i++){
+            if(bookmarks[i].url === url){
+                bookmarks.splice(i,1);
+            }
+        }
+        //set to localStorage
+        localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+
+        fetchBookmark();
+    }
+   
+    </script>
+   
+</body>
+</html>
